@@ -13,12 +13,12 @@
     "react-scripts": "3.3.0"
   },
   "scripts": {
-    "start": "react-scripts start flow",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "build": "babel src/ -d lib/",
-    "prepublish": "npm run build",
-    "flow": "flow"
+    "flow": "flow",
+    "eslint-check": "eslint --print-config .eslintrc.json | eslint-config-prettier-check"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -36,9 +36,10 @@
     ]
   },
   "devDependencies": {
-    "@babel/cli": "^7.7.5",
-    "@babel/core": "^7.7.5",
-    "@babel/preset-flow": "^7.7.4",
-    "flow-bin": "^0.113.0"
+    "eslint": "^6.7.2",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-react": "^7.17.0",
+    "prettier": "^1.19.1"
   }
 }
