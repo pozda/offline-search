@@ -1,10 +1,28 @@
 // @flow
-import React, { useState, useMemo } from "react";
-// import { } from "react-router-dom";
+import React, { useState, useMemo, useEffect } from "react";
+import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 import db from "./Database/Database";
 import Header from "./Components/Header/Header";
 import CardItem from "./Components/CardItem/Carditem";
-import Paper from "@material-ui/core/Paper";
+import { makeStyles } from "@material-ui/core/styles";
+import Button from "@material-ui/core/Button";
+import CircularProgress from "@material-ui/core/Button";
+import SingleProduct from "./Components/SingleProduct/SingleProduct";
+import DatabaseSync from "./Components/DatabaseSync/DatabaseSync";
+
+const useStyles = makeStyles(theme => ({
+  container: {
+    maxWidth: "1620px",
+    width: "100%",
+    display: "flex",
+    flexWrap: "wrap",
+    margin: "auto",
+    padding: "20px 0",
+    [theme.breakpoints.up("sm")]: {
+      justifyContent: "space-around"
+    }
+  }
+}));
 
 type ProductOriginal = {
   data: string,
@@ -16,15 +34,16 @@ type ProductOriginal = {
   }
 };
 
-type Product = {
+export type Product = {
   SKU: string,
   name: string,
   keywords: string,
-  description: string,
   image: string
 };
 
 const App = () => {
+  const history = useHistory();
+  const classes = useStyles();
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [resultsLoaded, setResultsLoaded] = useState(false);
@@ -37,6 +56,10 @@ const App = () => {
       )),
     [searchResults]
   );
+
+  useEffect(() => {
+    searchTheDatabase(query);
+  }, []);
 
   const normalizeProducts = (products: ProductOriginal[]) =>
     products.map((product: ProductOriginal) => ({
@@ -70,6 +93,7 @@ const App = () => {
   const searchTheDatabase = (query: string) => {
     setIsLoading(true);
     setResultsLoaded(false);
+    history.push("/");
     let allResults = [];
     const fillResults = (result: Product[]) => {
       allResults.push(...result);
@@ -94,7 +118,6 @@ const App = () => {
         return resultArray;
       })
       .then(resultArray => {
-        console.log(resultArray);
         setSearchResults(resultArray);
         setResultsLoaded(true);
         setIsLoading(false);
@@ -105,18 +128,25 @@ const App = () => {
     setQuery(e.target.value);
   };
 
+  const handleEnterKey = (e: SyntheticInputEvent<HTMLInputElement>) => {
+    if (e?.key === "Enter" && query.length > 0) {
+      searchTheDatabase(query);
+    }
+  };
+
   return (
     <div>
-      <Header handleQuery={handleQuery} />
-      <Paper>{resultsLoaded && results}</Paper>
-
-      <button onClick={() => populateDatabase(products)}>
-        populateDatabase
-      </button>
-
-      <button onClick={() => console.log(searchResults)}>inspect SR</button>
-      <button onClick={() => console.log(results)}>inspect vR</button>
-      <button onClick={() => searchTheDatabase(query)}>inspect query</button>
+      <Header handleQuery={handleQuery} handleEnterKey={handleEnterKey} />
+      <div className={classes.container}>
+        <Switch>
+          <Route exact path={"/"}>
+            {isLoading ? <CircularProgress /> : resultsLoaded && results}
+          </Route>
+          <Route exact path={"/database-sync"} component={DatabaseSync} />
+          <Route path={"/product/sku-:sku"} component={SingleProduct} />
+          <Redirect to={"/database-sync"} />
+        </Switch>
+      </div>
     </div>
   );
 };
