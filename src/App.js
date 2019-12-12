@@ -144,7 +144,7 @@ const App = () => {
           </Route>
           <Route exact path={"/database-sync"} component={DatabaseSync} />
           <Route path={"/product/sku-:sku"} component={SingleProduct} />
-          <Redirect to={"/database-sync"} />
+          <Redirect to={"/"} />
         </Switch>
       </div>
     </div>
