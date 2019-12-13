@@ -6,5 +6,4 @@ const env = ((process.env: any): { [string]: string }); // if you're sure that e
 export default {
   foo: env.FOO,
   bar: env.BAR
-  // ...
 };
